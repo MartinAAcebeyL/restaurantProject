@@ -5,8 +5,9 @@ from . import phone_number
 from sqlalchemy import Enum
 from datetime import datetime
 from sqlalchemy.event import listen
+from sqlalchemy import asc, desc
 import random
-class Pensionado(db.Model):
+class Pensionado(db.Model, ):
     __tablename__ = "pensionados"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -19,6 +20,12 @@ class Pensionado(db.Model):
     @classmethod
     def create(cls, name, phone, email, sex):
         return Pensionado(name=name, phone=phone, email=email, sex=sex)
+
+    @classmethod
+    def get_by_page(cls, order, curret_page, per_page = 10):
+        sort = desc(Pensionado.id) if order=="desc" else asc(Pensionado.id)
+        tasks = Pensionado.query.order_by(sort).paginate(curret_page, per_page)
+        return tasks.items
     
     def save(self):
         try:
@@ -28,13 +35,20 @@ class Pensionado(db.Model):
         except:
             return False
 
+    def unsave(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except:
+            return False
+
 def insertar_registros(*args, **kwargs):
-    for i in range(5):
+    for i in range(58):
         name = fake.name()
         phone = fake.phone_number()
         email = fake.email()
         sex = random.choice(['M', 'F'])
-        print(name, phone, email, sex)
         pensionado = Pensionado.create(name=name, phone=phone, email=email, sex=sex)
         if not pensionado.save():
             print(f'{i} error, no se introdujo a ls BD')

@@ -2,7 +2,8 @@ import json
 from flask import request
 from flask import Blueprint
 from ..Models.Pensionado import Pensionado
-from ..shemas import pensionado_shema, pensionado_shemas
+from ..shemas import pensionado_shema, pensionado_shemas, paramsPensionadoShema
+
 from ..responses import *
 
 api = Blueprint('api', __name__, url_prefix="/restaurant/pensionados")
@@ -34,20 +35,18 @@ def get_pensionado(id):
 
 @api.route("/", methods=["POST"])
 def create_pensionado():
-    print(request)
-    print(request.json)
-    print(request.get_json())
-    print(request.get_data())
+    response = request.get_json()
 
+    pensionado_shema_validate = paramsPensionadoShema.validate(response)
 
-    # email = request.json.get('email')
-    # name = request.json.get('name')
-    # phone = request.json.get('phone')
-    # sex = request.json.get('sex')
+    if pensionado_shema_validate:
+        return bad_request(message=pensionado_shema_validate)
 
-    # pensionado = Pensionado.create(name, phone, email, sex)
-    # if pensionado.save():
-    #     return pensionado_shema.dump(pensionado)
+    pensionado = Pensionado.create(name=response['name'], phone=response['phone'],
+                            email=response['email'], sex=response['sex'])
+    print(pensionado_shema.dump(pensionado))
+    if pensionado.save():
+        return pensionado_shema.dump(pensionado)
     return bad_request(message="en prueba")
 
 @api.route("/<id>", methods=["PATCH, PUT"])

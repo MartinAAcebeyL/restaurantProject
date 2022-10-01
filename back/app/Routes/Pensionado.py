@@ -1,4 +1,3 @@
-import json
 from flask import request
 from flask import Blueprint
 from ..Models.Pensionado import Pensionado
@@ -35,36 +34,50 @@ def get_pensionado(id):
 
 @api.route("/", methods=["POST"])
 def create_pensionado():
-    response = request.get_json()
+    response_json = request.get_json()
 
-    pensionado_shema_validate = paramsPensionadoShema.validate(response)
+    pensionado_shema_validate = paramsPensionadoShema.validate(response_json)
 
     if pensionado_shema_validate:
         return bad_request(message=pensionado_shema_validate)
 
-    pensionado = Pensionado.create(name=response['name'], phone=response['phone'],
-                            email=response['email'], sex=response['sex'])
-    print(pensionado_shema.dump(pensionado))
+    if Pensionado.exist(response_json['phone'], response_json['email']):
+        return bad_request(message="Ya existe un registro con estos datos")
+    
+    pensionado = Pensionado.create(name=response_json['name'], phone=response_json['phone'],
+                            email=response_json['email'], sex=response_json['sex'])
     if pensionado.save():
-        return pensionado_shema.dump(pensionado)
-    return bad_request(message="en prueba")
+        return response(data=pensionado_shema.dump(pensionado), message="registro exitoso")
 
-@api.route("/<id>", methods=["PATCH, PUT"])
+    return bad_request(message="registro erroneo")
+
+@api.route("/<id>", methods=["PATCH", "PUT"])
 def update_pensionado(id):
     pensionado = Pensionado.query.get(id)
+    if pensionado is None:
+        return not_found(f"el usuario con id: {id}, no existe!!!")
 
+    response_json = request.get_json()
+    pensionado_shema_messages = paramsPensionadoShema.validate(response_json)
+    if pensionado_shema_messages:
+        return bad_request(message=pensionado_shema_messages)
+    
     pensionado.email = request.json.get('email', pensionado.email)
-    pensionado.name = request.json.get('name', pensionado.name)
+    pensionado.name  = request.json.get('name', pensionado.name)
     pensionado.phone = request.json.get('phone', pensionado.phone)
-    pensionado.sex = request.json.get('sex', pensionado.sex)
+    pensionado.sex   = request.json.get('sex', pensionado.sex)
 
     if pensionado.save():
-        return pensionado_shema.dump(pensionado)
-    return bad_request()
+        return response(pensionado_shema.dump(pensionado), message="actualizacion exitosa")
+    return bad_request(message="Algo salio mal en la DB")
 
 @api.route("/<id>", methods=["DELETE"])
 def delete_pensionado(id):
     pensionado = Pensionado.query.get(id)
+    
+    if pensionado is None:
+        return not_found(f"el usuario con id: {id}, no existe!!!")
+
     if pensionado.unsave():
-        return pensionado_shema.dump(pensionado)
-    return bad_request()
+        return response(pensionado_shema.dump(pensionado), message="Eliminacion exitosa")
+    return bad_request(message="Algo salio mal")

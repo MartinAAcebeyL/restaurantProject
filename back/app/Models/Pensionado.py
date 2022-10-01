@@ -1,3 +1,4 @@
+from unicodedata import name
 from . import db
 from . import fake
 from . import phone_number
@@ -6,12 +7,13 @@ from sqlalchemy import Enum
 from datetime import datetime
 from sqlalchemy.event import listen
 from sqlalchemy import asc, desc
+from sqlalchemy import or_
 import random
-class Pensionado(db.Model, ):
+class Pensionado(db.Model):
     __tablename__ = "pensionados"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable = False, unique = True)
+    name = db.Column(db.String(50), nullable = False)
     phone = db.Column(db.String(40), nullable = False, unique = True)
     email = db.Column(db.String(80), nullable = False, unique = True)
     sex = db.Column(db.Enum("M", "F", "O"), nullable=False, server_default="M")
@@ -26,6 +28,13 @@ class Pensionado(db.Model, ):
         sort = desc(Pensionado.id) if order=="desc" else asc(Pensionado.id)
         tasks = Pensionado.query.order_by(sort).paginate(curret_page, per_page)
         return tasks.items
+
+    @classmethod
+    def exist(cls, phone, email, show=False):
+        pensiondos = cls.query.filter(
+            or_(cls.phone == phone, cls.email == email))
+        if show: print(pensiondos.all())
+        return True if pensiondos.count() > 0 else False
     
     def save(self):
         try:

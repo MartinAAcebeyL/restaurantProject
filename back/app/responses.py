@@ -1,6 +1,6 @@
 from flask import jsonify
 
-def response(data:dict, message):
+def response(data:dict, message:str):
     return jsonify(
         {
             'succses':True,

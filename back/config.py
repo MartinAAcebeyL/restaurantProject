@@ -1,7 +1,7 @@
 from decouple import config
 
 class Config:
-    pass
+    SECRET_key = config('SECRET_KEY')
 
 class Development(Config):
     DEBUG = True

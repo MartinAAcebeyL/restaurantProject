@@ -1,32 +1,29 @@
-from unicodedata import name
-from . import db
-from . import fake
-from . import phone_number
+from . import *
 
-from sqlalchemy import Enum
-from datetime import datetime
-from sqlalchemy.event import listen
-from sqlalchemy import asc, desc
-from sqlalchemy import or_
-import random
-class Pensionado(db.Model):
-    __tablename__ = "pensionados"
+class Usuario(db.Model):
+    __tablename__ = "usuarios"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable = False)
     phone = db.Column(db.String(40), nullable = False, unique = True)
     email = db.Column(db.String(80), nullable = False, unique = True)
+    password = db.Column(db.String(60), nullable=False)
     sex = db.Column(db.Enum("M", "F", "O"), nullable=False, server_default="M")
+    administrador = db.Column(db.Boolean(), nullable=False)
     resgistred = db.Column(db.DateTime(), nullable=False, default= datetime.now())
 
     @classmethod
-    def create(cls, name, phone, email, sex):
-        return Pensionado(name=name, phone=phone, email=email, sex=sex)
+    def create(cls, name, phone, sex, email, password, administrador=False):
+        hashed_password = generate_password_hash(password=password, method='sha256') 
+        
+        return Usuario(name=name, phone=phone, sex=sex, 
+                       email=email, password=password,
+                administrador=administrador)
 
     @classmethod
     def get_by_page(cls, order, curret_page, per_page = 10):
-        sort = desc(Pensionado.id) if order=="desc" else asc(Pensionado.id)
-        tasks = Pensionado.query.order_by(sort).paginate(curret_page, per_page)
+        sort = desc(Usuario.id) if order == "desc" else asc(Usuario.id)
+        tasks = Usuario.query.order_by(sort).paginate(curret_page, per_page)
         return tasks.items
 
     @classmethod
@@ -52,15 +49,31 @@ class Pensionado(db.Model):
         except:
             return False
 
+
 def insertar_registros(*args, **kwargs):
-    for i in range(58):
+    usuario = Usuario.create(
+        name="Martin Acebey L", phone="+59173883448", 
+        sex="M", email="martinaal2000@gmail.com",
+        password="administrador", administrador=True)
+
+    if not usuario.save():
+        print('error, ADMIN no se introdujo a ls BD')
+
+
+    default_password = '123456789'
+    for i in range(50):
         name = fake.name()
         phone = fake.phone_number()
-        email = fake.email()
         sex = random.choice(['M', 'F'])
-        pensionado = Pensionado.create(name=name, phone=phone, email=email, sex=sex)
-        if not pensionado.save():
+        email = fake.email()
+        password = default_password
+        
+        usuario = Usuario.create(\
+            name=name, phone=phone, sex=sex, email=email,\
+            password=password)
+        
+        if not usuario.save():
             print(f'{i} error, no se introdujo a ls BD')
 
 
-listen(Pensionado.__table__, "after_create", insertar_registros)
+listen(Usuario.__table__, "after_create", insertar_registros)

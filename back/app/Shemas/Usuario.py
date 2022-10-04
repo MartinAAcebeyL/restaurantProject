@@ -1,16 +1,11 @@
-from random import choices
-from marshmallow import Schema
-from marshmallow import fields
-from marshmallow.validate import Length, OneOf
+from . import *
 
-
-class PensionadoShema(Schema):
+class UsuarioShema(Schema):
     class Meta:
         ordered = True
         fields = ('id', 'name', 'phone', 'email', 'sex', 'resgistred')
 
-
-class ParamsPensionadoShema(Schema):
+class ParamsUsuarioShema(Schema):
     name = fields.Str(required=True,
                       validate=Length(min=10, max=50),
                       error_messages={
@@ -33,7 +28,7 @@ class ParamsPensionadoShema(Schema):
     })
 
 
-pensionado_shema = PensionadoShema()
-pensionado_shemas = PensionadoShema(many=True)
+usuario_shema  = UsuarioShema()
+usuario_shemas = UsuarioShema(many=True)
 
-paramsPensionadoShema = ParamsPensionadoShema()
+paramsUsuarioShema = ParamsUsuarioShema()

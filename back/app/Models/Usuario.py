@@ -7,17 +7,16 @@ class Usuario(db.Model):
     name = db.Column(db.String(50), nullable = False)
     phone = db.Column(db.String(40), nullable = False, unique = True)
     email = db.Column(db.String(80), nullable = False, unique = True)
-    password = db.Column(db.String(60), nullable=False)
+    password = db.Column(db.String(90), nullable=False)
     sex = db.Column(db.Enum("M", "F", "O"), nullable=False, server_default="M")
     administrador = db.Column(db.Boolean(), nullable=False)
     resgistred = db.Column(db.DateTime(), nullable=False, default= datetime.now())
 
     @classmethod
     def create(cls, name, phone, sex, email, password, administrador=False):
-        hashed_password = generate_password_hash(password=password, method='sha256') 
-        
+        hashed_password = generate_password_hash(password=password, method='sha256')
         return Usuario(name=name, phone=phone, sex=sex, 
-                       email=email, password=password,
+                       email=email, password=hashed_password,
                 administrador=administrador)
 
     @classmethod
@@ -33,6 +32,10 @@ class Usuario(db.Model):
         if show: print(pensiondos.all())
         return True if pensiondos.count() > 0 else False
     
+    def set_password(self, password):
+        self.password = generate_password_hash(
+            password=password, method='sha256')
+
     def save(self):
         try:
             db.session.add(self)
@@ -61,7 +64,7 @@ def insertar_registros(*args, **kwargs):
 
 
     default_password = '123456789'
-    for i in range(50):
+    for i in range(49):
         name = fake.name()
         phone = fake.phone_number()
         sex = random.choice(['M', 'F'])

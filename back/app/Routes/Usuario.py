@@ -1,7 +1,11 @@
 from flask import request
 from flask import Blueprint
-from ..Models import Usuario
-from ..Shemas.Usuario import usuario_shema, usuario_shemas, paramsUsuarioShema
+from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
+
+from ..Models.Usuario import Usuario
+from ..Shemas.Usuario import usuario_shema, usuario_shemas, paramsUsuarioShema, loginParamsUsuarioShema
+from ..funtions_jwt import write_token, time_token, check_token
 
 from ..responses import *
 
@@ -24,7 +28,6 @@ def get_usuarios():
         message=f"existe {len(usuarios)} registros"
                     )
 
-
 @api.route("/<id>", methods=["GET"])
 def get_usuario(id):
     usuario = Usuario.query.get(id)
@@ -44,8 +47,13 @@ def create_usuario():
     if Usuario.exist(response_json['phone'], response_json['email']):
         return bad_request(message="Ya existe un registro con estos datos")
     
+    if not 'administrador' in response_json:
+        response_json['administrador'] = False
+    
     usuario = Usuario.create(name=response_json['name'], phone=response_json['phone'],
-                            email=response_json['email'], sex=response_json['sex'])
+                            email=response_json['email'], sex=response_json['sex'], 
+                             administrador=response_json['administrador'],
+                             password=response_json['password'])
     if usuario.save():
         return response(data=usuario_shema.dump(usuario), message="registro exitoso")
 
@@ -66,7 +74,12 @@ def update_usuario(id):
     usuario.name  = request.json.get('name', usuario.name)
     usuario.phone = request.json.get('phone', usuario.phone)
     usuario.sex   = request.json.get('sex', usuario.sex)
+    usuario.administrador = request.json.get(
+        'administrador', usuario.administrador)
+    usuario.password = generate_password_hash(
+        password=request.json.get('password'), method='sha256')
 
+ 
     if usuario.save():
         return response(usuario_shema.dump(usuario), message="actualizacion exitosa")
     return bad_request(message="Algo salio mal en la DB")
@@ -81,3 +94,24 @@ def delete_usuario(id):
     if usuario.unsave():
         return response(usuario_shema.dump(usuario), message="Eliminacion exitosa")
     return bad_request(message="Algo salio mal")
+
+@api.route("/login",methods=['POST'])
+def user_login():
+    data = request.get_json()
+    error_messages = loginParamsUsuarioShema.validate(data)
+    
+    if error_messages:
+        return bad_request(message=error_messages)
+    
+    usuario = Usuario.query.filter_by(email=data.get('email')).first()
+
+    if check_password_hash(usuario.password, data.get('password')):
+        return write_token(data=data,time={"minutes":5},heads={"user":"i am"})
+    
+    return bad_request(message="datos incorectos")
+
+
+@api.route("/verifyToken", methods=['GET'])
+def verify_token():
+    token = request.headers.get('Authorization').split(" ")[1]
+    return check_token(token=token, show=True)  

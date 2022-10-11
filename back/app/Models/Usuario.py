@@ -10,6 +10,9 @@ class Usuario(db.Model):
     password = db.Column(db.String(90), nullable=False)
     sex = db.Column(db.Enum("M", "F", "O"), nullable=False, server_default="M")
     administrador = db.Column(db.Boolean(), nullable=False)
+
+    pension = db.relationship("Pension")
+
     resgistred = db.Column(db.DateTime(), nullable=False, default= datetime.now())
 
     @classmethod
@@ -63,20 +66,20 @@ def insertar_registros(*args, **kwargs):
         print('error, ADMIN no se introdujo a ls BD')
 
 
-    default_password = '123456789'
-    for i in range(49):
-        name = fake.name()
-        phone = fake.phone_number()
-        sex = random.choice(['M', 'F'])
-        email = fake.email()
-        password = default_password
+    # default_password = '123456789'
+    # for i in range(49):
+    #     name = fake.name()
+    #     phone = fake.phone_number()
+    #     sex = random.choice(['M', 'F'])
+    #     email = fake.email()
+    #     password = default_password
         
-        usuario = Usuario.create(\
-            name=name, phone=phone, sex=sex, email=email,\
-            password=password)
+    #     usuario = Usuario.create(\
+    #         name=name, phone=phone, sex=sex, email=email,\
+    #         password=password)
         
-        if not usuario.save():
-            print(f'{i} error, no se introdujo a ls BD')
+    #     if not usuario.save():
+    #         print(f'{i} error, no se introdujo a ls BD')
 
 
-listen(Usuario.__table__, "after_create", insertar_registros)
+# listen(Usuario.__table__, "after_create", insertar_registros)

@@ -16,6 +16,7 @@ marshmallow==3.18.0
 mysqlclient==2.1.1
 packaging==21.3
 pycodestyle==2.9.1
+PyJWT==2.5.0
 pyparsing==3.0.9
 python-dateutil==2.8.2
 python-decouple==3.6

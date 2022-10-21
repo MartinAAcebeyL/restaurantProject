@@ -7,7 +7,8 @@ from .Models.Pension import Pension
 from .Models.Usuario import Usuario
 from .Models.Registro import Registro
 
-from .Routes.Usuario import api
+from .Routes.Usuario import api as api_usuarios
+from .Routes.Pension import api as api_pension
 
 
 
@@ -16,7 +17,8 @@ def create_app(config):
 
     migrate = Migrate()
     app.config.from_object(config)
-    app.register_blueprint(api)
+    app.register_blueprint(api_usuarios, url_prefix="/usuarios")
+    app.register_blueprint(api_pension,  url_prefix="/usuario/pension")
 
     with app.app_context():
         db.init_app(app)

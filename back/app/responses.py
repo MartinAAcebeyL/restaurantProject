@@ -29,7 +29,6 @@ def bad_request(message):
         }
     ),400
 
-
 def token_time_out():
     return jsonify(
         {
@@ -49,3 +48,8 @@ def token_error():
             'code':400
         }
     ),400
+
+def prueba(message="prueba"):
+    return jsonify({
+        "message": message
+    }),200

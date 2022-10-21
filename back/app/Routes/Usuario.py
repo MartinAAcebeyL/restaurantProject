@@ -1,19 +1,11 @@
-from crypt import methods
-from flask import request
-from flask import Blueprint
-from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import datetime
-
+from . import *
 from ..Models.Usuario import Usuario
-from ..Models.Pension import Pension
 
 from ..Shemas.Usuario import usuario_shema, usuario_shemas, paramsUsuarioShema, loginParamsUsuarioShema
+
 from ..funtions_jwt import write_token, time_token, check_token
 
-from ..responses import *
-
-api = Blueprint('api', __name__, url_prefix="/restaurant/pensionados")
-
+api = Blueprint('api_usuarios', __name__)
 
 @api.route("/", methods=["GET"])
 def get_usuarios():
@@ -118,9 +110,3 @@ def user_login():
 def verify_token():
     token = request.headers.get('Authorization').split(" ")[1]
     return check_token(token=token, show=True)
-
-@api.route("/pruebas", methods=["GET"])
-def pruebas():
-    ids = [i.id for i in Pension.query.all()]
-    print(ids)
-    return {"message":"entorno de pruebas"}

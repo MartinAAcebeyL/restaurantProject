@@ -18,7 +18,6 @@ class Pension(db.Model):
 
     usuario_id = db.relationship("Usuario")
 
-# monto, universitario, almuerzo_completo, activo
     @classmethod
     def create(cls, monto, universitario, almuerzo_completo, activo):
         return Pension(monto=monto, universitario=universitario, 

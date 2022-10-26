@@ -56,6 +56,22 @@ class Pension(db.Model):
         except:
             return False
 
+    def __str__(self) -> str:
+        return f"Pension {self.monto} {super().__str__()}"
+
+    def to_representation(self):
+        return {
+            "id":self.id,
+            "monto": self.monto,
+            "universitario": self.universitario,
+            "almuerzo_completo": self.almuerzo_completo,
+            "activo": self.activo,
+            "observaciones": self.observaciones,
+            "cantidad_consumida": self.cantidad_consumida,
+            "resgistred_at": self.resgistred_at,
+            "usuario_id": self.usuario_id
+        }
+
 # monto, universitario, almuerzo_completo, activo
 def insertar_registros(*args, **kwargs):
     for i in range(19):

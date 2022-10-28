@@ -4,7 +4,8 @@ class UsuarioShema(Schema):
     class Meta:
         ordered = True
         fields = ('id', 'name', 'phone', 'sex',  'email',
-                  'password', 'administrador', 'resgistred')
+                  'password', 'administrador', 'resgistred',
+                  'pension_id')
 
 class ParamsUsuarioShema(Schema):
     name = fields.Str(required=True,

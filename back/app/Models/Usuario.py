@@ -1,6 +1,7 @@
 from sqlalchemy import text 
 from . import *
 from .Pension import Pension
+from .Pension import registrar_pension 
 
 class Usuario(db.Model):
     __tablename__ = "usuarios"
@@ -17,10 +18,7 @@ class Usuario(db.Model):
                            default=datetime.now())
 
     pension_id = db.Column(db.Integer, db.ForeignKey('pensiones.id'))
-    pension = db.relationship("Pension", overlaps="usuario_id")
-
-    # registro_id = db.Column(db.Integer, db.ForeignKey('registros.id'))
-    # registro = db.relationship("Registro")
+    pension = db.relationship("Pension")
 
 
     @classmethod
@@ -52,7 +50,8 @@ class Usuario(db.Model):
             db.session.add(self)
             db.session.commit()
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def unsave(self):
@@ -75,22 +74,20 @@ def insertar_registros(*args, **kwargs):
 
 
     default_password = '123456789'
-    for i in range(49):
+    for i in range(20):
         name = fake.name()
         phone = fake.phone_number()
         sex = random.choice(['M', 'F'])
         email = fake.email()
         password = default_password
 
-        ids = [i.id for i in Pension.query.all()]
-        pension_id = fake.random_element(elements=ids)
-        
-        usuario = Usuario.create(\
-            name=name, phone=phone, sex=sex, email=email,\
-            password=password,pension_id=pension_id)
-        
-        if not usuario.save():
-            print(f'{i} error, no se introdujo a ls BD')
+        pension_id = registrar_pension()
+
+        usuario = Usuario.create(
+            name=name, phone=phone, sex=sex, email=email,
+            password=password, pension_id=pension_id)
+        usuario.save()
+            # print(f'{i} error, no se introdujo a ls BD')
 
 
 listen(Usuario.__table__, "after_create", insertar_registros)

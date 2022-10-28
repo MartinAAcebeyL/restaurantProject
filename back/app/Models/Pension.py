@@ -16,8 +16,6 @@ class Pension(db.Model):
     resgistred_at = db.Column(db.DateTime(), nullable=False,
                            default=datetime.now())
 
-    usuario_id = db.relationship("Usuario")
-
     @classmethod
     def create(cls, monto, universitario, almuerzo_completo, activo):
         return Pension(monto=monto, universitario=universitario, 
@@ -41,11 +39,12 @@ class Pension(db.Model):
 
 
     def save(self):
-        try:
+        try:    
             db.session.add(self)
             db.session.commit()
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def unsave(self):
@@ -57,7 +56,7 @@ class Pension(db.Model):
             return False
 
     def __str__(self) -> str:
-        return f"Pension {self.monto} {super().__str__()}"
+        return f"Pension {self.monto} id: {self.id}"
 
     def to_representation(self):
         return {
@@ -68,19 +67,17 @@ class Pension(db.Model):
             "activo": self.activo,
             "observaciones": self.observaciones,
             "cantidad_consumida": self.cantidad_consumida,
-            "resgistred_at": self.resgistred_at,
-            "usuario_id": self.usuario_id
+            "resgistred_at": self.resgistred_at
         }
 
 # monto, universitario, almuerzo_completo, activo
-def insertar_registros(*args, **kwargs):
-    for i in range(19):
-        monto = random.choice([350, 175, 300, 150])
-        universitario = fake.boolean(chance_of_getting_true=25)
-        almuerzo_completo = fake.boolean(chance_of_getting_true=80)
-        activo = fake.boolean(chance_of_getting_true=70)
-        pension = Pension.create(monto=monto, universitario=universitario,
-            almuerzo_completo=almuerzo_completo, activo=activo)
-        if not pension.save():
-            print(f'{i} error al registrar la pension')
-listen(Pension.__table__, "after_create", insertar_registros)
+def registrar_pension():
+    monto = random.choice([350, 175, 300, 150])
+    universitario = fake.boolean(chance_of_getting_true=25)
+    almuerzo_completo = fake.boolean(chance_of_getting_true=80)
+    activo = fake.boolean(chance_of_getting_true=70)
+
+    pension = Pension.create(monto=monto, universitario=universitario,
+        almuerzo_completo=almuerzo_completo, activo=activo)
+    pension.save()
+    return pension.id

@@ -1,7 +1,8 @@
 from . import *
 from ..Models.Usuario import Usuario
 
-from ..Shemas.Usuario import usuario_shema, usuario_shemas, paramsUsuarioShema, loginParamsUsuarioShema
+from ..Shemas.Usuario import (usuario_shema, usuario_shemas, 
+    paramsCreateUsuarioShema, paramsUpdateUsuarioShema, loginParamsUsuarioShema)
 
 from ..funtions_jwt import write_token, time_token, check_token
 
@@ -33,8 +34,8 @@ def get_usuario(id):
 @api.route("/", methods=["POST"])
 def create_usuario():
     response_json = request.get_json()
-
-    usuario_shema_validate = paramsUsuarioShema.validate(response_json)
+    usuario_shema_validate = paramsCreateUsuarioShema.validate(response_json)
+    print(usuario_shema_validate)
 
     if usuario_shema_validate:
         return bad_request(message=usuario_shema_validate)
@@ -47,8 +48,9 @@ def create_usuario():
     
     usuario = Usuario.create(name=response_json['name'], phone=response_json['phone'],
                             email=response_json['email'], sex=response_json['sex'], 
-                             administrador=response_json['administrador'],
-                             password=response_json['password'])
+                            administrador=response_json['administrador'],
+                            password=response_json['password'], 
+                            pension_id=response_json['pension_id'])
     if usuario.save():
         return response(data=usuario_shema.dump(usuario), message="registro exitoso")
 
@@ -61,7 +63,7 @@ def update_usuario(id):
         return not_found(f"el usuario con id: {id}, no existe!!!")
 
     response_json = request.get_json()
-    usuario_shema_messages = paramsUsuarioShema.validate(response_json)
+    usuario_shema_messages = paramsUpdateUsuarioShema.validate(response_json)
     if usuario_shema_messages:
         return bad_request(message=usuario_shema_messages)
     

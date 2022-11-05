@@ -1,4 +1,3 @@
-from sqlalchemy import text 
 from . import *
 from .Pension import Pension
 from .Pension import registrar_pension 
@@ -17,7 +16,8 @@ class Usuario(db.Model):
     resgistred = db.Column(db.DateTime(), nullable=False,
                            default=datetime.now())
 
-    pension_id = db.Column(db.Integer, db.ForeignKey('pensiones.id'))
+    pension_id = db.Column(
+        db.Integer, db.ForeignKey('pensiones.id'), unique=True)
     pension = db.relationship("Pension")
 
 
@@ -87,7 +87,6 @@ def insertar_registros(*args, **kwargs):
             name=name, phone=phone, sex=sex, email=email,
             password=password, pension_id=pension_id)
         usuario.save()
-            # print(f'{i} error, no se introdujo a ls BD')
 
 
 listen(Usuario.__table__, "after_create", insertar_registros)

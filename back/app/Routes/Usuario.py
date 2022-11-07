@@ -35,7 +35,6 @@ def get_usuario(id):
 def create_usuario():
     response_json = request.get_json()
     usuario_shema_validate = paramsCreateUsuarioShema.validate(response_json)
-    print(usuario_shema_validate)
 
     if usuario_shema_validate:
         return bad_request(message=usuario_shema_validate)

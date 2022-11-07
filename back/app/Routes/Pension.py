@@ -4,14 +4,16 @@ from ..Models.Pension import Pension
 from ..Shemas.Pension import paramsPensionShema
 api = Blueprint('api_pension', __name__)
 
-"""
-tareas: 
-    crear
-    verificar consumido
-    dias que faltan
 
-"""
-# monto, universitario, almuerzo_completo, activo
+def exist_pension(func):
+    def wrapper(*args, **kwargs):
+        pension = Pension.query.filter_by(id=kwargs['id']).first()
+        print(pension)
+        if pension is None:
+            return not_found(f"no existe la pension con id:{kwargs['id']}")
+        return func(pension)
+    wrapper.__name__ = func.__name__
+    return wrapper
 
 #para crear una nueva pension
 @api.route("/", methods=["POST"])
@@ -29,36 +31,19 @@ def create():
             message="Pension creada")
     return bad_request(message="Datos incorrectos")
 
-"""
-monto = db.Column(db.Integer, nullable=False, default=350)
-universitario = db.Column(db.Boolean(), nullable=False)
-#0 => no universitario // 1 => universitario
-almuerzo_completo = db.Column(db.Boolean(), nullable=False, default=True)
-#0 => solo segundos || 1=> completo
-activo = db.Column(db.Boolean(), nullable=False, default=True)
-observaciones = db.Column(db.Text, nullable=True)
-cantidad_consumida = db.Column(db.Integer, nullable=True, default=0)
-"""
-def exist_pension(func):
-    def wrapper(*args, **kwargs):
-        pension = Pension.query.filter_by(id=kwargs['id']).first()
-        print(pension)
-        if pension is None:
-            return not_found("no existe la pension")
-        return func(pension)
-    wrapper.__name__ = func.__name__
-    return wrapper
-
-@api.route("/<int:id>", methods=["OTHER"])
+@api.route("/<int:id>", methods=["GET"])
 @exist_pension
 def vericar_consumo(pension):
-    print(pension.to_representation())
-
     if not pension.activo:
         return bad_request(message=f"este pension no esta activa")
-    return prueba()
+    return response({"dias_restantes": pension.dias_restantes()},message="")
 
-@api.route("/<int:id>", methods=["POST"])
+@api.route("/<int:id>", methods=["PATCH"])
 @exist_pension
 def aumentar_consumo(pension):
-    pension
+    if not (pension.activo and pension.verificar_dias_restantes):
+        return bad_request(message="Ya no tiene almuerzo disnibles")
+
+    pension.aumentar_consumo()
+    return response({"consumido":pension.cantidad_consumida},
+                    message="Se agrego correctamente")

@@ -6,8 +6,8 @@ class Pension(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     monto = db.Column(db.Integer, nullable=False, default=350)
-    # si es medio o mes completo
     tipo = db.Column(db.Boolean())
+    # si es medio o mes completo
     universitario = db.Column(db.Boolean(), nullable=False)
     # 0 => no universitario // 1 => universitario
     almuerzo_completo = db.Column(db.Boolean(), nullable=False, default=True)
@@ -26,24 +26,27 @@ class Pension(db.Model):
                        almuerzo_completo=almuerzo_completo,
                        tipo=tipo, activo=activo)
 
-    def dias_restante(self) -> int:
+    #devuele la cantidad de almuerzos que quedan por consumir
+    def dias_restantes(self) -> int:
         tiene_almuerzos = self.verificar_dias_restantes()
         if tiene_almuerzos:
             tipo = 30 if self.tipo else 15
             return tipo - self.cantidad_consumida
-        self.activo = False
         return 0
 
+    #Si es que aun cuemta con dias de pension
     def verificar_dias_restantes(self) -> bool:
         tiempo = 30 if self.tipo else 15
-        return self.cantidad_consumida <= tiempo
+        almuerzos = self.cantidad_consumida < tiempo
+        if not almuerzos:
+            self.activo=False
+            self.cantidad_consumida=0
+            self.save()
+        return almuerzos
 
     def aumentar_consumo(self) -> int:
-        tiene_almuerzos = self.verificar_dias_restantes()
-        if tiene_almuerzos:
-            self.cantidad_consumida += 1
-            return
-        return -1
+        self.cantidad_consumida += 1
+        self.save()
 
     def save(self) -> bool:
         try:

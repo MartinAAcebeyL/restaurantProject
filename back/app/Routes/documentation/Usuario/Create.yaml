@@ -1,0 +1,33 @@
+creacion de nuevo usuario
+---
+tags:
+  - Usuario
+parameters:
+  - name: nombre
+    type: string
+    required: true
+  - name: phone
+    type: string
+    required: true
+  - name: email
+    type: string
+    required: true
+  - name: sex
+    type: boolean
+    enum: ["M","F","O"]
+    required: true
+    value: M
+  - name: administrador
+    type: boolean
+    default: False
+  - name: password
+    type: string
+    required: true
+  - name: pension_id
+    type: integer
+    required: true
+responses:
+  200:
+    description: Al crear un nuevo usuario
+  400:
+    description: Cuando se manda datos erroneos

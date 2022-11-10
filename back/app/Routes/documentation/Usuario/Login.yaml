@@ -1,0 +1,16 @@
+Login de usuario
+---
+tags:
+  - Usuario
+parameters:
+  - name: email
+    type: string
+    required: true
+  - name: password
+    type: string
+    required: true
+responses:
+  200:
+    description: Se loguea y retorna JWT
+  400:
+    description: Cuando se manda datos erroneos

@@ -1,0 +1,26 @@
+creacion de nueva pension
+---
+tags:
+  - Pension
+parameters:
+  - name: monto
+    type: integer
+    enum: [350,300, 175, 150]
+    required: true
+  - name: universitario
+    type: boolean
+    required: true
+    value: true
+  - name: almuerzo completo
+    type: boolean
+    required: true
+    value: true
+  - name: activo
+    type: boolean
+    required: true
+    value: true
+responses:
+  200:
+    description: Al crear un nuevo registro
+  400:
+    description: Cuando se manda datos erroneos

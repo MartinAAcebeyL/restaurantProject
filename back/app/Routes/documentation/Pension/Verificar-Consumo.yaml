@@ -1,0 +1,13 @@
+Para verificar cuantos dias le falta consumir al cliente
+---
+tags:
+  - Pension
+parameters:
+  - name: id
+    required: true
+    type: integer
+responses:
+  200:
+    description: responde los dias faltantes
+  400:
+    description: En caso de datos erroneos o que no exista la pension

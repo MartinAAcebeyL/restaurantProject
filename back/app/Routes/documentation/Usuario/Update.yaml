@@ -1,0 +1,16 @@
+Actualizacion de usuario
+---
+tags:
+  - Usuario
+parameters:
+  - name: phone
+    type: string
+  - name: email
+    type: string
+  - name: password
+    type: string
+responses:
+  200:
+    description: Al actualizar un usuario
+  400:
+    description: Cuando se manda datos erroneos

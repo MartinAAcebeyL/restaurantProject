@@ -1,0 +1,9 @@
+Lista a todos los usuarios 
+---
+tags:
+  - Usuario
+responses:
+  200:
+    description: Lista a todos los usuarios
+  400:
+    description: Cuando no existen registros

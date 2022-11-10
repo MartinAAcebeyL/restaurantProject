@@ -1,0 +1,13 @@
+Para aumentar dia consumido
+---
+tags:
+  - Pension
+parameters:
+  - name: id
+    required: true
+    type: integer
+responses:
+  200:
+    description: Aumenta el contador de consumo
+  400:
+    description: En caso de datos erroneos o que no exista la pension

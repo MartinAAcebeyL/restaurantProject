@@ -1,0 +1,13 @@
+Verifica token
+---
+tags:
+  - Usuario
+parameters:
+  - name: Token
+    type: JWT
+    required: true
+responses:
+  200:
+    description: si el token sigue es valido y no sufrio alteraciones
+  400:
+    description: Cuando se manda datos erroneos

@@ -1,0 +1,13 @@
+Eliminar un determinado usuario 
+---
+tags:
+  - Usuario
+parameters:
+  - name: id
+    required: true
+    type: integer
+responses:
+  200:
+    description: Elimina al usuario con determinado id
+  400:
+    description: Cuando no existe un usuario con el id dado

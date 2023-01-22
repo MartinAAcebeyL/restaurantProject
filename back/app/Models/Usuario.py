@@ -62,6 +62,8 @@ class Usuario(db.Model):
         except:
             return False
 
+    def __str__(self):
+        return f"Usuario: {self.name}, {self.email} {self.administrador}"
 
 def insertar_registros(*args, **kwargs):
     usuario = Usuario.create(

@@ -19,8 +19,29 @@ def exist_pension(func):
     return wrapper
 
 
+def is_admin(func):
+    def wrapper(*args, **kwargs):
+        try:
+            token = request.headers.get('Authorization').split(" ")[1]
+        except:
+            token = None
+        if not token:
+            return not_found(message="No se ha enviado el token")
+
+        header_user = check_token(
+            token=token, show=True).get('header').get('user')
+        # header_user = {"administrador": False}
+
+        if not header_user.get('administrador'):
+            return not_found(message="No tiene permisos para esta ruta")
+        return func(*args, **kwargs)
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+
 @api.route("/", methods=["GET"])
 @swag_from("./documentation/Usuario/Get-All.yaml")
+@is_admin
 def get_usuarios():
     usuarios = Usuario.query.all()
     if len(usuarios) <= 0:
@@ -39,6 +60,7 @@ def get_usuarios():
 
 @api.route("/<id>", methods=["GET"])
 @swag_from("./documentation/Usuario/Get.yaml")
+@is_admin
 @exist_pension
 def get_usuario(usuario):
     return response(usuario_shema.dump(usuario), "usuario encontrado")
@@ -117,7 +139,10 @@ def user_login():
         return bad_request(message="no existe el user con estos datos")
 
     if check_password_hash(usuario.password, data.get('password')):
-        return write_token(data=data, time={"minutes": 5}, heads={"user": "i am"})
+        return write_token(data=data, heads={"user": {
+            "id": usuario.id,
+            "administrador": usuario.administrador
+        }})
 
     return bad_request(message="datos incorectos")
 

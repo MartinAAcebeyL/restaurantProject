@@ -1,55 +1,63 @@
 from flask import jsonify
 
-def response(data:dict, message:str):
+
+def response(data: dict, message: str):
     return jsonify(
         {
-            'succses':True,
-            'message':message,
-            'data':data
+            'succses': True,
+            'message': message,
+            'data': data
         }
-    ),200
+    ), 200
+
 
 def not_found(message):
     return jsonify(
         {
-            'succses':False,
-            'data':{},
+            'succses': False,
+            'data': {},
             'message': message,
-            'code':404
+            'code': 404
         }
-    ),404
+    ), 404
+
 
 def bad_request(message):
     return jsonify(
         {
-            'succses':False,
-            'data':{},
+            'succses': False,
+            'data': {},
             'message': message,
-            'code':400
+            'code': 400
         }
-    ),400
+    ), 400
+
 
 def token_time_out():
     return jsonify(
         {
-            'succses':False,
-            'data':{},
+            'succses': False,
+            'data': {},
             'message': "El token expiro",
-            'code':400
+            'code': 400
         }
-    ),400
+    ), 400
+
 
 def token_error():
     return jsonify(
         {
-            'succses':False,
-            'data':{},
-            'message': "Error en la validacion",
-            'code':400
+            'succses': False,
+            'data': {},
+            'message': "Error en la validacion del token",
+            'code': 400
         }
-    ),400
+    ), 400
+
 
 def prueba(message="prueba"):
-    return jsonify({
-        "message": message
-    }),200
+    return jsonify(
+        {
+            "message": message
+        }
+    ), 200

@@ -31,13 +31,12 @@ def write_token(data: dict, heads: dict = {}, time: dict = {}):
     })
 
 
-def check_token(token, show: bool = False):
+def check_token(token):
     try:
         data = decode_complete(token, config(
             'SECRET_KEY'),
             algorithms=['HS256'])
         del data['signature']
-        
         return data
     except DecodeError:
         return token_error()

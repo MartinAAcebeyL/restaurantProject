@@ -2,18 +2,18 @@ from . import *
 from ..Models.Usuario import Usuario
 from ..Shemas.Usuario import (usuario_shema, usuario_shemas,
                               paramsCreateUsuarioShema, paramsUpdateUsuarioShema, loginParamsUsuarioShema)
-from ..funtions_jwt import write_token, time_token, check_token
+from ..funtions_jwt import write_token, check_token
 
 from flasgger import swag_from
 
 api = Blueprint('api_usuarios', __name__)
 
 
-def exist_pension(func):
+def exist_usuario(func):
     def wrapper(*args, **kwargs):
         usuario = Usuario.query.filter_by(id=kwargs['id']).first()
         if usuario is None:
-            return not_found(f"no existe la usuario con id:{kwargs['id']}")
+            return not_found(f"no existe la usuario con id: {kwargs['id']}")
         return func(usuario)
     wrapper.__name__ = func.__name__
     return wrapper
@@ -21,16 +21,14 @@ def exist_pension(func):
 
 def is_admin(func):
     def wrapper(*args, **kwargs):
-        try:
-            token = request.headers.get('Authorization').split(" ")[1]
-        except:
-            token = None
-        if not token:
-            return not_found(message="No se ha enviado el token")
+        token = request.headers.get('Authorization', "0 0").split(" ")[1]
+        check_token_ = check_token(token=token)
+
+        if type(check_token_) == tuple and check_token_[1] == 400:
+            return not_found(message=check_token_[0].get_json().get('message'))
 
         header_user = check_token(
-            token=token, show=True).get('header').get('user')
-        # header_user = {"administrador": False}
+            token=token).get('header').get('user')
 
         if not header_user.get('administrador'):
             return not_found(message="No tiene permisos para esta ruta")
@@ -38,6 +36,24 @@ def is_admin(func):
     wrapper.__name__ = func.__name__
     return wrapper
 
+
+def is_the_same_user(func):
+    def wrapper(*args, **kwargs):
+        token = request.headers.get('Authorization', "0 0").split(" ")[1]
+        check_token_ = check_token(token=token)
+
+        if type(check_token_) == tuple and check_token_[1] == 400:
+            return not_found(message=check_token_[0].get_json().get('message'))
+
+        header_user = check_token(
+            token=token).get('header').get('user')
+
+        if header_user.get('id') != args[0].id:
+            return bad_request(message="No es el mismo usuario")
+
+        return func(*args, **kwargs)
+    wrapper.__name__ = func.__name__
+    return wrapper
 
 @api.route("/", methods=["GET"])
 @swag_from("./documentation/Usuario/Get-All.yaml")
@@ -61,7 +77,7 @@ def get_usuarios():
 @api.route("/<id>", methods=["GET"])
 @swag_from("./documentation/Usuario/Get.yaml")
 @is_admin
-@exist_pension
+@exist_usuario
 def get_usuario(usuario):
     return response(usuario_shema.dump(usuario), "usuario encontrado")
 
@@ -94,7 +110,8 @@ def create_usuario():
 
 @api.route("/<id>", methods=["PATCH", "PUT"])
 @swag_from("./documentation/Usuario/Update.yaml")
-@exist_pension
+@exist_usuario
+@is_the_same_user
 def update_usuario(usuario):
     response_json = request.get_json()
     usuario_shema_messages = paramsUpdateUsuarioShema.validate(response_json)
@@ -117,7 +134,8 @@ def update_usuario(usuario):
 
 @api.route("/<id>", methods=["DELETE"])
 @swag_from("./documentation/Usuario/Delete.yaml")
-@exist_pension
+@exist_usuario
+@is_the_same_user
 def delete_usuario(usuario):
     if usuario.unsave():
         return response(usuario_shema.dump(usuario), message="Eliminacion exitosa")
@@ -151,4 +169,4 @@ def user_login():
 @swag_from("./documentation/Usuario/Verify-token.yaml")
 def verify_token():
     token = request.headers.get('Authorization').split(" ")[1]
-    return check_token(token=token, show=True)
+    return check_token(token=token)

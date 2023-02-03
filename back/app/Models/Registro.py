@@ -9,20 +9,22 @@ class Registro(db.Model):
     sopa = db.Column(db.String(50), nullable=False)
     segundo = db.Column(db.String(50), nullable=False)
     observaciones = db.Column(db.Integer, nullable=True)
-    usuario_id = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
 
+    # relaciones
+    usuario_id = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
 
     @classmethod
     def create(cls, fecha, sopa, segundo, observaciones):
         return Registro(fecha=fecha, sopa=sopa, segundo=segundo,
-                       observaciones=observaciones)
+                        observaciones=observaciones)
 
     def save(self):
         try:
             db.session.add(self)
             db.session.commit()
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def unsave(self):

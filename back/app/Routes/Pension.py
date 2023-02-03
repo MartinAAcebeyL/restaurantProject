@@ -1,6 +1,6 @@
 from . import *
-from ..Models.Pension import Pension
-from ..Shemas.Pension import paramsPensionShema
+from app.Models.Pension import Pension
+from app.Shemas.Pension import paramsPensionShema
 api = Blueprint('api_pension', __name__)
 
 

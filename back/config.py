@@ -12,6 +12,10 @@ class Test(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = config("URI_TEST")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    WTF_CSRF_ENABLED = False
+    TESTING = True
+    TEST = True
+
 
 config = {
     "development": Development,

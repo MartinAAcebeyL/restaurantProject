@@ -18,6 +18,8 @@ class Pension(db.Model):
     resgistred_at = db.Column(db.DateTime(), nullable=False,
                               default=datetime.now())
 
+    # relaciones
+    usuario = db.relationship("Usuario", uselist=False, back_populates="pension")
     # crear una nueva instancia
     @classmethod
     def create(cls, monto, universitario, almuerzo_completo, activo):
@@ -80,8 +82,6 @@ class Pension(db.Model):
             "cantidad_consumida": self.cantidad_consumida,
             "resgistred_at": self.resgistred_at
         }
-
-# monto, universitario, almuerzo_completo, activo
 
 
 def registrar_pension() -> int:

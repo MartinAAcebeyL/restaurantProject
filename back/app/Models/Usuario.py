@@ -2,7 +2,6 @@ from . import *
 from .Pension import Pension
 from .Pension import registrar_pension
 
-
 class Usuario(db.Model):
     __tablename__ = "usuarios"
 
@@ -17,10 +16,10 @@ class Usuario(db.Model):
     resgistred = db.Column(db.DateTime(), nullable=False,
                            default=datetime.now())
 
-    #relaciones
+    # relaciones
     pension_id = db.Column(
         db.Integer, db.ForeignKey('pensiones.id'), unique=True)
-    pension = db.relationship("Pension")
+    pension = db.relationship("Pension", back_populates="usuario")
 
     @classmethod
     def create(cls, name, phone, sex, email, password, pension_id=None, administrador=False):

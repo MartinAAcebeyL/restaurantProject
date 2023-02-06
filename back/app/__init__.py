@@ -1,4 +1,3 @@
-from re import A
 from flask import Flask
 from flask_migrate import Migrate
 from flasgger import Swagger
@@ -19,6 +18,9 @@ def create_app(config):
     migrate = Migrate()
     swagger = Swagger()
     app.config.from_object(config)
+    
+    app.app_context().push()
+
     app.register_blueprint(api_usuarios, url_prefix="/usuarios")
     app.register_blueprint(api_pension,  url_prefix="/usuario/pension")
 

@@ -2,6 +2,7 @@ from . import *
 from .Pension import Pension
 from .Pension import registrar_pension
 
+
 class Usuario(db.Model):
     __tablename__ = "usuarios"
 
@@ -70,15 +71,15 @@ class Usuario(db.Model):
 
 def insertar_registros(*args, **kwargs):
     usuario = Usuario.create(
-        name="Martin Acebey L", phone="+59173883448",
-        sex="M", email="martinaal2000@gmail.com",
+        name="Martin Acebey L", phone="+59112345678",
+        sex="M", email="admin@gmail.com",
         password="administrador", administrador=True)
 
     if not usuario.save():
         print('error, ADMIN no se introdujo a ls BD')
 
     default_password = '123456789'
-    for i in range(20):
+    for _ in range(20):
         name = fake.name()
         phone = fake.phone_number()
         sex = random.choice(['M', 'F'])
@@ -93,4 +94,4 @@ def insertar_registros(*args, **kwargs):
         usuario.save()
 
 
-listen(Usuario.__table__, "after_create", insertar_registros)
+# listen(Usuario.__table__, "after_create", insertar_registros)

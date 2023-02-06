@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 from faker import Faker
 from faker.providers import phone_number
 
@@ -9,8 +8,7 @@ from sqlalchemy.event import listen
 from sqlalchemy import asc, desc
 from sqlalchemy import or_
 import random
+from app import db
 
-
-db = SQLAlchemy()
 Faker.seed(40)
 fake = Faker()

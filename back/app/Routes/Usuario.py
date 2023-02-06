@@ -39,6 +39,7 @@ def is_admin(func):
 
 @api.route("/", methods=["GET"])
 @swag_from("./documentation/Usuario/Get-All.yaml")
+@is_admin
 def get_usuarios():
     usuarios = Usuario.query.all()
     if len(usuarios) <= 0:

@@ -5,48 +5,47 @@ from app.tests.factories.Usuario import create_one_user
 
 
 class TestBase(unittest.TestCase):
-    def setUp(self) -> None:
-        from app import create_app, db
+    @classmethod
+    def setUpClass(cls) -> None:
+        from app import create_app
         from config import config
 
-        faker = Faker(12)
-
         config = config["test"]
-        self.app = create_app(config)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
+        cls.app = create_app(config)
+        cls.client = cls.app.test_client()
 
-        self.urls_usuario = {
-            "base_usuario": "usuarios/",
-            "login": "usuarios/login",
+        cls.usuario = create_one_user()
+        cls.super_usuario = create_one_user(administrador=True)
+        cls.usuario.save()
+        cls.super_usuario.save()
+
+        cls.urls_usuario = {
+            "base": "usuarios/",
+            "login": "usuarios/login"
         }
+        return super().setUpClass()
 
-        self.usuario = create_one_user()
-        self.super_usuario = create_one_user(administrador=True)
+    @classmethod
+    def tearDownClass(cls) -> None:
+        from app import db
 
-        print(self.super_usuario.email, self.super_usuario.password)
+        db.session.remove()
+        db.drop_all()
+
+        return super().tearDownClass()
+
+    def setUp(self) -> None:
 
         request = self.client.post(
-            self.urls_usuario["login"],
+            TestBase.urls_usuario["login"],
             json={
-                "email": "admin@gmail.com",
+                "email": TestBase.super_usuario.email,
                 "password": "123456"
             }
         )
 
-        print("test")
-        print(request.get_json())
-        print(request)
-
-        request= self.client.get(
-            self.urls_usuario["base_usuario"],
-        )
-
-        print("despues")
-        print(request.get_json())
-        print(request)
-
+        self.header = {"Authorization": "Bearer " +
+                       request.get_json()['token']}
 
         return super().setUp()
 

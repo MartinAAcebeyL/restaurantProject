@@ -19,10 +19,30 @@ class TestBase(unittest.TestCase):
         cls.usuario.save()
         cls.super_usuario.save()
 
-        cls.urls_usuario = {
+        cls.urls = {
             "base": "usuarios/",
             "login": "usuarios/login"
         }
+
+        request = cls.client.post(
+            cls.urls["login"],
+            json={
+                "email": cls.super_usuario.email,
+                "password": "123456"
+            })
+        cls.token_super_user = {"Authorization": "Bearer " +
+                                request.get_json()['token']}
+
+        request = cls.client.post(
+            cls.urls["login"],
+            json={
+                "email": cls.usuario.email,
+                "password": "123456"
+            }
+        )
+        cls.token_user = {"Authorization": "Bearer " +
+                          request.get_json()['token']}
+
         return super().setUpClass()
 
     @classmethod
@@ -33,21 +53,3 @@ class TestBase(unittest.TestCase):
         db.drop_all()
 
         return super().tearDownClass()
-
-    def setUp(self) -> None:
-
-        request = self.client.post(
-            TestBase.urls_usuario["login"],
-            json={
-                "email": TestBase.super_usuario.email,
-                "password": "123456"
-            }
-        )
-
-        self.header = {"Authorization": "Bearer " +
-                       request.get_json()['token']}
-
-        return super().setUp()
-
-    def test_algo(self):
-        pass

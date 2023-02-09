@@ -1,7 +1,7 @@
 from . import *
 from app.Models.Usuario import Usuario
 from app.Shemas.Usuario import (usuario_shema, usuario_shemas,
-                              paramsCreateUsuarioShema, paramsUpdateUsuarioShema, loginParamsUsuarioShema)
+                                paramsCreateUsuarioShema, paramsUpdateUsuarioShema, loginParamsUsuarioShema)
 from app.funtions_jwt import write_token, check_token
 
 from flasgger import swag_from
@@ -139,10 +139,11 @@ def user_login():
         return bad_request(message="no existe el user con estos datos")
 
     if check_password_hash(usuario.password, data.get('password')):
-        return write_token(data=data, heads={"user": {
+        token = write_token(data=data, heads={"user": {
             "id": usuario.id,
             "administrador": usuario.administrador
-        }})
+        }}).get_json()['token']
+        return response(data={"token": token}, message="login exitoso")
 
     return bad_request(message="datos incorectos")
 

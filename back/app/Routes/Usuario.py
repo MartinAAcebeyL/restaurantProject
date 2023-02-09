@@ -42,7 +42,7 @@ def is_admin(func):
 @is_admin
 def get_usuarios():
     usuarios = Usuario.query.all()
-    if len(usuarios) <= 0:
+    if len(usuarios) <= 1:
         return not_found(message="No existen datos")
 
     order = request.args.get('order', 'asc')

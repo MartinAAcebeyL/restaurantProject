@@ -9,7 +9,7 @@ class TestLogin(TestBase):
                 "email": self.super_usuario.email,
             }
         )
-        
+
         self.assertEqual(respose.status_code, 400)
         self.assertEqual(respose.get_json()[
                          'message']['password']['message'], 'Password requerido')
@@ -36,7 +36,6 @@ class TestLogin(TestBase):
                 "password": "1234567"
             }
         )
-        print(respose.get_json())
 
         self.assertEqual(respose.status_code, 400)
         self.assertEqual(respose.get_json()['message'], 'datos incorectos')
@@ -50,8 +49,23 @@ class TestLogin(TestBase):
                 "password": "123456"
             }
         )
-        print(respose.get_json())
 
         self.assertEqual(respose.status_code, 200)
-        self.assertEqual(respose.get_json()['data']['token'], self.token_super_user['Authorization'].split(' ')[1])
+        self.assertEqual(respose.get_json()['data']['token'],
+                        self.token_super_user['Authorization'].split(' ')[1])
         self.assertEqual(respose.get_json()['succses'], True)
+
+    def test_super_user_con_email_incorrecto(self):
+        respose = self.client.post(
+            self.urls['login'],
+            json={
+                "email": "bad@email.com",
+                "password": "1234567"
+            }
+        )
+
+
+        self.assertEqual(respose.status_code, 400)
+        self.assertEqual(respose.get_json()[
+                         'message'], 'no existe el user con estos datos')
+        self.assertEqual(respose.get_json()['succses'], False)

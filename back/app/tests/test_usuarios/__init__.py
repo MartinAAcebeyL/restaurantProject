@@ -30,8 +30,8 @@ class TestBase(unittest.TestCase):
                 "email": cls.super_usuario.email,
                 "password": "123456"
             })
-        cls.token_super_user = {"Authorization": "Bearer " +
-                                request.get_json()['token']}
+        token = request.get_json().get("data").get("token")
+        cls.token_super_user = {"Authorization": "Bearer " + token}
 
         request = cls.client.post(
             cls.urls["login"],
@@ -40,8 +40,8 @@ class TestBase(unittest.TestCase):
                 "password": "123456"
             }
         )
-        cls.token_user = {"Authorization": "Bearer " +
-                          request.get_json()['token']}
+        token = request.get_json().get("data").get("token")
+        cls.token_user = {"Authorization": "Bearer " + token}
 
         return super().setUpClass()
 

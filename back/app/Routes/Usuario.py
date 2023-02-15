@@ -3,7 +3,6 @@ from app.Models.Usuario import Usuario
 from app.Shemas.Usuario import (usuario_shema, usuario_shemas,
                                 paramsCreateUsuarioShema, paramsUpdateUsuarioShema, loginParamsUsuarioShema)
 from app.funtions_jwt import write_token, check_token
-
 from flasgger import swag_from
 
 api = Blueprint('api_usuarios', __name__)

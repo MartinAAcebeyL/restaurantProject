@@ -53,11 +53,3 @@ def token_error():
             'code': 400
         }
     ), 400
-
-
-def prueba(message="prueba"):
-    return jsonify(
-        {
-            "message": message
-        }
-    ), 200

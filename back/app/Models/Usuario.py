@@ -69,29 +69,27 @@ class Usuario(db.Model):
         return f"Usuario: {self.name}, {self.email} {self.administrador}"
 
 
-def insertar_registros(*args, **kwargs):
-    usuario = Usuario.create(
-        name="Martin Acebey L", phone="+59112345678",
-        sex="M", email="admin@gmail.com",
-        password="administrador", administrador=True)
+# def insertar_registros(*args, **kwargs):
+#     usuario = Usuario.create(
+#         name="Martin Acebey L", phone="+59112345678",
+#         sex="M", email="admin@gmail.com",
+#         password="administrador", administrador=True)
 
-    if not usuario.save():
-        print('error, ADMIN no se introdujo a ls BD')
+#     if not usuario.save():
+#         print('error, ADMIN no se introdujo a ls BD')
 
-    default_password = '123456789'
-    for _ in range(20):
-        name = fake.name()
-        phone = fake.phone_number()
-        sex = random.choice(['M', 'F'])
-        email = fake.email()
-        password = default_password
+#     default_password = '123456789'
+#     for _ in range(20):
+#         name = fake.name()
+#         phone = fake.phone_number()
+#         sex = random.choice(['M', 'F'])
+#         email = fake.email()
+#         password = default_password
 
-        pension_id = registrar_pension()
+#         pension_id = registrar_pension()
 
-        usuario = Usuario.create(
-            name=name, phone=phone, sex=sex, email=email,
-            password=password, pension_id=pension_id)
-        usuario.save()
-
-
+#         usuario = Usuario.create(
+#             name=name, phone=phone, sex=sex, email=email,
+#             password=password, pension_id=pension_id)
+#         usuario.save()
 # listen(Usuario.__table__, "after_create", insertar_registros)

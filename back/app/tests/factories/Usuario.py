@@ -15,3 +15,16 @@ def create_one_user(administrador: bool = False):
     )
 
     return usuario
+
+
+def get_token(client, email, password):
+    response = client.post(
+        "usuarios/login",
+        json={
+            "email": email,
+            "password": password
+        }
+    )
+    token = response.get_json().get("data").get("token")
+
+    return token

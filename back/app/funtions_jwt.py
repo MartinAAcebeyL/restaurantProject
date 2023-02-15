@@ -13,7 +13,9 @@ def time_token(time_dict: dict):
         return time + timedelta(days=30)
     final_time = time + timedelta(days=time_dict.get('days', 0),
                                   hours=time_dict.get('hours', 0),
-                                  minutes=time_dict.get('minutes', 0))
+                                  minutes=time_dict.get('minutes', 0),
+                                  seconds=time_dict.get('seconds', 0)
+                                  )
 
     return final_time.timestamp()
 
